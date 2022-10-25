@@ -47,12 +47,17 @@ class Evaluator:
         "True Negative Rate",
         "False Discovery Rate",
         "Total Positives Test",
-        "Total Positives Reference"
+        "Total Positives Reference",
+        "Hausdorff Distance 95",
+        "Avg. Surface Distance",
+        "Surface Dice 1mm",
+        "Surface Dice 2mm",
+        "Surface Dice 3mm"
     ]
 
     default_advanced_metrics = [
         #"Hausdorff Distance",
-        "Hausdorff Distance 95",
+        #"Hausdorff Distance 95",
         #"Avg. Surface Distance",
         #"Avg. Symmetric Surface Distance"
     ]
@@ -327,7 +332,7 @@ def aggregate_scores(test_ref_pairs,
                      json_description="",
                      json_author="Fabian",
                      json_task="",
-                     num_threads=2,
+                     num_threads=32,
                      **metric_kwargs):
     """
     test = predicted image
@@ -457,7 +462,7 @@ def evaluate_folder(folder_with_gts: str, folder_with_predictions: str, labels: 
     assert all([i in files_gt for i in files_pred]), "files missing in folder_with_gts"
     test_ref_pairs = [(join(folder_with_predictions, i), join(folder_with_gts, i)) for i in files_pred]
     res = aggregate_scores(test_ref_pairs, json_output_file=join(folder_with_predictions, "summary.json"),
-                           num_threads=8, labels=labels, **metric_kwargs)
+                           num_threads=32, labels=labels, **metric_kwargs)
     return res
 
 

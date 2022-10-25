@@ -42,14 +42,13 @@ class nnUNetTrainerV2(nnUNetTrainer):
     """
 
     def __init__(self, plans_file, fold, output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
-                 unpack_data=True, deterministic=True, fp16=False):
+                 unpack_data=True, deterministic=True, fp16=False, epochs=1000):
         super().__init__(plans_file, fold, output_folder, dataset_directory, batch_dice, stage, unpack_data,
                          deterministic, fp16)
-        self.max_num_epochs = 1000
+        self.max_num_epochs = epochs
         self.initial_lr = 1e-2
         self.deep_supervision_scales = None
         self.ds_loss_weights = None
-
         self.pin_memory = True
 
     def initialize(self, training=True, force_load_plans=False):
@@ -63,6 +62,7 @@ class nnUNetTrainerV2(nnUNetTrainer):
         :return:
         """
         if not self.was_initialized:
+            print("MAXIMUM NUMBER OF EPOCHS: ", self.max_num_epochs)
             maybe_mkdir_p(self.output_folder)
 
             if force_load_plans or (self.plans is None):
@@ -385,6 +385,7 @@ class nnUNetTrainerV2(nnUNetTrainer):
         self.data_aug_params["do_elastic"] = False
         self.data_aug_params['selected_seg_channels'] = [0]
         self.data_aug_params['patch_size_for_spatialtransform'] = self.patch_size
+        #self.data_aug_params["independent_scale_factor_for_each_axis"] = True
 
         self.data_aug_params["num_cached_per_thread"] = 2
 

@@ -15,6 +15,8 @@
 import numpy as np
 from medpy import metric
 
+import surface_distance as surfdist
+
 
 def assert_shape(test, reference):
 
@@ -382,6 +384,57 @@ def avg_surface_distance_symmetric(test=None, reference=None, confusion_matrix=N
 
     return metric.assd(test, reference, voxel_spacing, connectivity)
 
+def surface_dice_1mm(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, voxel_spacing=None, connectivity=1, **kwarg):
+    if confusion_matrix is None:
+        confusion_matrix = ConfusionMatrix(test, reference)
+
+    test_empty, test_full, reference_empty, reference_full = confusion_matrix.get_existence()
+
+    if test_empty or test_full or reference_empty or reference_full:
+        if nan_for_nonexisting:
+            return float("NaN")
+        else:
+            return 0
+
+    test, reference = confusion_matrix.test, confusion_matrix.reference
+
+    surface_distance = surfdist.compute_surface_distances(reference, test, spacing_mm = voxel_spacing)   
+    return surfdist.compute_surface_dice_at_tolerance(surface_distance, 1)
+
+def surface_dice_2mm(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, voxel_spacing=None, connectivity=1, **kwarg):
+    if confusion_matrix is None:
+        confusion_matrix = ConfusionMatrix(test, reference)
+
+    test_empty, test_full, reference_empty, reference_full = confusion_matrix.get_existence()
+
+    if test_empty or test_full or reference_empty or reference_full:
+        if nan_for_nonexisting:
+            return float("NaN")
+        else:
+            return 0
+
+    test, reference = confusion_matrix.test, confusion_matrix.reference
+    
+    surface_distance = surfdist.compute_surface_distances(reference, test, spacing_mm = voxel_spacing)   
+    return surfdist.compute_surface_dice_at_tolerance(surface_distance, 2) 
+
+def surface_dice_3mm(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, voxel_spacing=None, connectivity=1, **kwarg):
+    if confusion_matrix is None:
+        confusion_matrix = ConfusionMatrix(test, reference)
+
+    test_empty, test_full, reference_empty, reference_full = confusion_matrix.get_existence()
+
+    if test_empty or test_full or reference_empty or reference_full:
+        if nan_for_nonexisting:
+            return float("NaN")
+        else:
+            return 0
+
+    test, reference = confusion_matrix.test, confusion_matrix.reference
+    
+    surface_distance = surfdist.compute_surface_distances(reference, test, spacing_mm = voxel_spacing)   
+    return surfdist.compute_surface_dice_at_tolerance(surface_distance, 3)  
+
 
 ALL_METRICS = {
     "False Positive Rate": false_positive_rate,
@@ -402,5 +455,8 @@ ALL_METRICS = {
     "Total Positives Test": total_positives_test,
     "Total Negatives Test": total_negatives_test,
     "Total Positives Reference": total_positives_reference,
-    "total Negatives Reference": total_negatives_reference
+    "total Negatives Reference": total_negatives_reference,
+    "Surface Dice 1mm": surface_dice_1mm,
+    "Surface Dice 2mm": surface_dice_2mm,
+    "Surface Dice 3mm": surface_dice_3mm
 }
